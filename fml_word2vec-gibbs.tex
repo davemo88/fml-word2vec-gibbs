@@ -10,11 +10,22 @@
 
 \begin{abstract}
 
-%The word-embedding models of Mikolov et al. \cite{word2vec1} \cite{word2vec2} are related to Bregman Divergence by the softmax function. The parametrized distribution resulting from the softmax is a Gibbs distribution, 
+\noindent The word-embedding models of Mikolov et al. \cite{word2vec1} \cite{word2vec2} are related to Bregman Divergence by the softmax function. The parametrized distribution resulting from the softmax is a Gibbs distribution, which arises from the choice of KL-divergence as a similarity measure in Maximum Entropy models. It is known that the distribution that minimizes the KL-divergence is same Gibbs distribution that maximizes the likelihood of the data.
+
+Here we can go a few ways with this:
+
+
+\begin{itemize}
+	\item show similar equivalence i.e. show word2vec to minimize the KL-divergence between two distributions
+	\subitem perhaps this will improve the characterization of the word embeddings
+	\item use the exponential distribution corresponding with another bregman divergance to perform the normalization in word2vec
+\end{itemize}
 
 \end{abstract}
 
-\section{}
+
+
+\section{Introduction}
 
 \begin{thebibliography}{1}
 \bibitem{word2vec1} Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean. {\em Efficient Estimation of Word Representations in Vector Space} arXiv:1301.3781v3 [cs.CL] 7 Sep 2013
