@@ -32,34 +32,39 @@
 
 \section{Introduction}
 
-word2vec\cite{word2vec1}\cite{word2vec2} is a recent promising word-embedding algorithm. It seeks to find vector representations of the words in a corpus such that similar words (in the sense of meaning and usage) will have similar embeddings. This quality is merely a loose notion about what makes for good word embeddings and not a technical condition. Nonetheless, word2vec has provided some encouraging results that hint at the supposed quality of its word embeddings. The most common examples are that the embedding of, say, "France" will not be far from the embedding of "Spain" and that relations such as:\\
+word2vec\cite{word2vec1}\cite{word2vec2} is a recent promising word-embedding algorithm. It seeks to find vector representation of words in a corpus such that similar words (in the sense of meaning and usage) will have similar embeddings. This quality is merely a loose notion about what makes for good word embeddings and not a technical condition. Nonetheless, word2vec has produced some encouraging results\cite{dummy} that hint at the supposed quality of its word embeddings. A common example is that the embedding of, say, "France" would not be far from the embedding of "Spain"\cite{dummy} and that relations such as:\\
 
 $w2v(France) + w2v(Paris) \simeq w2v(Spain) + w2v(Madrid)$\\
 
 \noindent may hold, where $w2v(\cdot)$ is the embedding.
 
-word2vec's skipgram model seeks to predict the context of a word given the word itself. A context of size $R$ comprises the $R$ words before and after the word in question and so each word in the corpus generates $2R$ word-context pairs to be classified. This is presented as the following optimization objective:\\
+word2vec uses a skipgram model that predicts the context of a word given the word itself. A context of size $R$ comprises the $R$ words before and after the word in question and so each word in the corpus generates $2R$ word-context pairs to be classified. This is presented as the following optimization objective:\\
 
-$\underset{W,C}{\text{argmax}} \underset{(x,y) \in S}{\Pi}{p(y|x; W, C)}$\\
+$\underset{W,C}{\text{argmax}} \underset{i \in m}{\Pi}{p(y_i|x_i; W, C)}$\\
 
 \noindent where $p$ is the softmax function parameterized by $W$ and $C$:\\
 
 $p(y_i|x_i; W,C) = \frac{e^{W_{x_i}} \cdot e^{C_{y_i}}}{\sum_{(x,y) \in S}e^{W_x} \cdot e^{C_y}}$.\\
 
-$W$ is the word-embedding matrix. $W_{x_i}$ is column of $W$ corresponding to the embedding of word $x_i$. $C$ is defined similarly for the contexts. The size of $W$ and $C$ is $V \times D$, where $V$ is the size of the vocabulary and $D$ is dimension we have chosen to use for embedding.
+$W$ is the word-embedding matrix. $W_{x_i}$ is the column of $W$ corresponding to the embedding of word $x_i$. $C$ is defined similarly for contexts. The size of $W$ and $C$ is $V \times D$, where $V$ is the size of the vocabulary and $D$ is dimension we have chosen to use for embedding.
 
-Thus word2vec seeks a Maximum Likelihood estimator of the sample $S$. However this objective is not convex as neither $W$ nor $C$ are fixed. When either $W$ or $C$ is fixed this becomes the well-known objective from logistic regression, which is convex and equivalent to Maximum Entropy\cite{dummy}. We will show that there is a corresponding (equivalent?) maximum entropy interpretation in the non-convex case as well.
+Thus word2vec seeks a Maximum Likelihood estimator of the sample $S$. However this objective is not convex as neither $W$ nor $C$ are fixed. When either is fixed this becomes the well-known objective from logistic regression, which is convex and equivalent to Maximum Entropy\cite{dummy}. We will show that there is a corresponding (equivalent?) Maximum Entropy interpretation in the non-convex case as well.
+
+\section{Maximum Entropy}
 
 In the Maximum Entropy formulation, we pose the objective:\\
 
 $\underset{W,C}{\text{argmin}} E \left[D(p(\cdot|x; W, C) \vert \vert  p_0(\cdot|x))\right]$\\
 
-\noindent where $p_0$ is the uniform distribution and the following condition holds:\\
+\noindent with\\
 
-$\forall (x,y) \in S: \hat{p}(y|x) = p(y|x; W,C)$\\
+$\hat{p}(y|x) = p(y|x; W,C)$\\
 
-\noindent where $\hat{p}$ is the sample distribution. 
+\noindent where $p_0$ is the uniform distribution and $\hat{p}$ is the sample distribution. Another way to express that condition is\\
 
+$\underset{x \sim \hat{p}}{E}\left[\underset{y \sim p(\cdot|x; W,C)}{E}\left[\Phi_C(x,y)\right]\right] = \underset{(x,y) \in S}{E}\left[\Phi_C(x,y)\right]$.
+
+Since the objective are not convex, we will 
 
 \begin{thebibliography}{1}
 \bibitem{word2vec1} Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean. {\em Efficient Estimation of Word Representations in Vector Space} arXiv:1301.3781v3 [cs.CL] 7 Sep 2013
