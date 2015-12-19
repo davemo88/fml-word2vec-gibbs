@@ -4,26 +4,61 @@
 \title{Bregman Divergence and word2vec}
 \author{Jonay Trenous, David Kasofsky}
 
+\usepackage{amsmath}
+
+\usepackage{amssymb}
+
+\usepackage{fancyhdr}
+
+\usepackage{tikz}
+
+\usepackage{pgfplots}
+
+\usepackage{float}
+
+\usepackage[]{algorithm2e} 
+
+\pagestyle{fancy}
+
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
 
-\noindent The word-embedding models of Mikolov et al.\cite{word2vec1}\cite{word2vec2} are related to Bregman Divergence by the softmax function. The parametrized distribution resulting from the softmax is a Gibbs distribution, which arises from the choice of KL-divergence as a similarity measure. For maximum entropy models, is known that the distribution that minimizes the KL-divergence is same Gibbs distribution that maximizes the likelihood of the data.
-
-Here we can go a few ways with this:
-
-
-\begin{itemize}
-	\item show similar equivalence i.e. show word2vec to minimize the KL-divergence between two distributions. perhaps this will improve the characterization of the word embeddings (or show that in this case it is not equivalent)
-	\item use the exponential distribution corresponding with another bregman divergance to perform the normalization in word2vec
-\end{itemize}
+\noindent The word-embedding models of Mikolov et al.\cite{word2vec1}\cite{word2vec2} are related to Bregman Divergence by the softmax function. The parametrized distribution resulting from the softmax is a Gibbs distribution, which arises from the choice of KL-divergence as a similarity measure. For maximum entropy models, it is known that the distribution that minimizes the KL-divergence is same Gibbs distribution that maximizes the likelihood of the data. From here we a give maximum entropy interpretation of word2vec using conditional relative entropy and an equivalent objective function.
 
 \end{abstract}
 
 \section{Introduction}
 
+word2vec\cite{word2vec1}\cite{word2vec2} is a recent promising word-embedding algorithm. It seeks to find vector representations of the words in a corpus such that similar words (in the sense of meaning and usage) will have similar embeddings. This quality is merely a loose notion about what makes for good word embeddings and not a technical condition. Nonetheless, word2vec has provided some encouraging results that hint at the supposed quality of its word embeddings. The most common examples are that the embedding of, say, "France" will not be far from the embedding of "Spain" and that relations such as:\\
+
+$w2v(France) + w2v(Paris) \simeq w2v(Spain) + w2v(Madrid)$\\
+
+\noindent may hold, where $w2v(\cdot)$ is the embedding.
+
+word2vec's skipgram model seeks to predict the context of a word given the word itself. A context of size $R$ comprises the $R$ words before and after the word in question and so each word in the corpus generates $2R$ word-context pairs to be classified. This is presented as the following optimization objective:\\
+
+$\underset{W,C}{\text{argmax}} \underset{(x,y) \in S}{\Pi}{p(y|x; W, C)}$\\
+
+\noindent where $p$ is the softmax function parameterized by $W$ and $C$:\\
+
+$p(y_i|x_i; W,C) = \frac{e^{W_{x_i}} \cdot e^{C_{y_i}}}{\sum_{(x,y) \in S}e^{W_x} \cdot e^{C_y}}$.\\
+
+$W$ is the word-embedding matrix. $W_{x_i}$ is column of $W$ corresponding to the embedding of word $x_i$. $C$ is defined similarly for the contexts. The size of $W$ and $C$ is $V \times D$, where $V$ is the size of the vocabulary and $D$ is dimension we have chosen to use for embedding.
+
+Thus word2vec seeks a Maximum Likelihood estimator of the sample $S$. However this objective is not convex as neither $W$ nor $C$ are fixed. When either $W$ or $C$ is fixed this becomes the well-known objective from logistic regression, which is convex and equivalent to Maximum Entropy\cite{dummy}. We will show that there is a corresponding (equivalent?) maximum entropy interpretation in the non-convex case as well.
+
+In the Maximum Entropy formulation, we pose the objective:\\
+
+$\underset{W,C}{\text{argmin}} E \left[D(p(\cdot|x; W, C) \vert \vert  p_0(\cdot|x))\right]$\\
+
+\noindent where $p_0$ is the uniform distribution and the following condition holds:\\
+
+$\forall (x,y) \in S: \hat{p}(y|x) = p(y|x; W,C)$\\
+
+\noindent where $\hat{p}$ is the sample distribution. 
 
 
 \begin{thebibliography}{1}
