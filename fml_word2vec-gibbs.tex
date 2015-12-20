@@ -42,13 +42,13 @@ word2vec uses a skipgram model that predicts the context of a word given the wor
 
 $\underset{W,C}{\text{argmax}} \underset{i \in m}{\Pi}{p(y_i|x_i; W, \Phi)}$\\
 
-\noindent where $p$ is the softmax function parameterized by $W$ and $\Phi$:\\
+\noindent where $x_i$ is a word, $y_i$ a context of $x_i$, and $p$ is the softmax function parameterized by $W$ and $\Phi$:\\
 
 $p(y_i|x_i; W,\Phi) = \frac{e^{W(x_i) \cdot \Phi(y_i)}}{\sum_{(x,y) \in S}e^{W(x) \cdot \Phi(y)}}$.\\
 
-$W$ is the word-embedding function which maps a word $x_i$ to a $D$-dimensional vector, where $D$ is the dimension we have chosen for embedding. Similarly $\Phi$ is the context embedding function, which maps a context $y_i$ to a $D$-dimensional vector. One can also imagine $W$ and $\Phi$ as matrices with size $V \times D$, where $V$ is the size of the vocabulary. Then $W(x_i)$ corresponds to the column of the matrix containing the embedding for $x_i$.
+$W$ is the word-embedding function which maps a word $x_i$ to a $D$-dimensional vector, where $D$ is the dimension we have chosen for embedding. Similarly $\Phi$ is the context embedding function, which maps a context $y_i$ to a $D$-dimensional vector. One can also imagine $W$ and $\Phi$ as matrices with size $V \times D$, where $V$ is the size of the vocabulary of our sample $S$. Then $W(x_i)$ corresponds to the column of the matrix W containing the embedding for $x_i$.
 
-Thus word2vec seeks a Maximum Likelihood estimator of the sample $S$. However this objective is not convex as neither $W$ nor $\Phi$ are fixed. When either is fixed this becomes the well-known objective from logistic regression, which is convex and equivalent to Maximum Entropy\cite{dummy}. We will show that there is a corresponding (equivalent?) Maximum Entropy interpretation in the non-convex case as well.
+Thus word2vec is solving a maximum likelihood problem over Gibbs distributions, as the softmax defines a Gibbs distribution. However this objective is not convex as both $W$ and $\Phi$ are unfixed. When either is fixed this becomes the well-known objective from logistic regression, which is convex and equivalent to Maximum Entropy\cite{dummy}. We will show that there is a corresponding Maximum Entropy interpretation in the non-convex case as well. 
 
 \section{Maximum Entropy}
 
