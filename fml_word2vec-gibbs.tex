@@ -17,9 +17,11 @@
 \usepackage{float}
 
 \usepackage[]{algorithm2e} 
-
+\usepackage{hyperref}
+\usepackage[style=numeric]{biblatex}
+\addbibresource{bib.bib}
 \pagestyle{fancy}
-
+\setlength{\parindent}{0in}
 \begin{document}
 
 \maketitle
@@ -40,7 +42,7 @@ $w2v(France) + w2v(Paris) \simeq w2v(Spain) + w2v(Madrid)$\\
 
 word2vec uses a skipgram model that predicts the context of a word given the word itself. A context of size $R$ comprises the $R$ words before and after the word in question and so each word in the corpus generates $2R$ word-context pairs to be classified. This is presented as the following optimization objective:\\
 
-$\underset{W,C}{\text{argmax}} \underset{i \in m}{\Pi}{p(y_i|x_i; W, \Phi)}$\\
+\begin{equation} \underset{W,C}{\text{argmax}} \underset{i \in m}{\Pi}{p(y_i|x_i; W, \Phi)}\label{eq:gibbs}\end{equation} 
 
 \noindent where $x_i$ is a word, $y_i$ a context of $x_i$, and $p$ is the softmax function parameterized by $W$ and $\Phi$:\\
 
@@ -54,25 +56,41 @@ Thus word2vec is solving a maximum likelihood problem over Gibbs distributions, 
 
 In the Maximum Entropy formulation, we pose the objective:\\
 
-$\underset{p(\cdot | x) \in \Delta, \Phi \in F}{\text{argmin}} \quad E \left[D(p(\cdot|x) \vert \vert  p_0(\cdot|x))\right]$\\
+\begin{equation}\underset{p(\cdot | x) \in \Delta, \Phi \in \mathbf{F}}{\text{argmin}} \quad E \left[D(p(\cdot|x) \vert \vert  p_0(\cdot|x))\right]\label{eq:maxent}
+\end{equation}
+\\
 
-\noindent with\\
+\noindent subject to\\
 
-$\underset{x \sim \hat{p}}{E}\left[\underset{y \sim p(\cdot|x)}{E}\left[\Phi(x,y)\right]\right] = \underset{(x,y) \in S}{E}\left[\Phi(x,y)\right]$.\\
+\begin{align}\underset{x \sim \hat{p}}{E}\left[\underset{y \sim p(\cdot|x)}{E}\left[\Phi(x,y)\right]\right] = \underset{(x,y) \in S}{E}\left[\Phi(x,y)\right]
+\end{align}
 
-\noindent where $p_0$ is the uniform distribution and $\hat{p}$ is the sample distribution. Another way to express that condition is\\
+\noindent where $p_0$ is the uniform distribution and $\hat{p}$ is the sample distribution. Note that, as opposed to the classical maximum entropy objective, the feature function $\Phi$ itself is now a parameter to be optimized. It is well known that the classical maximum entropy objective can be reformulated as a Gibbs-parametrized maximum likelihood problem. A very broad outline of the proof goes as follows
+\begin{itemize}
+\item First, incorporate the constraints in the objective with the use of Lagrangian multipliers
+\item Set the gradients of the resulting unconstrained objective to zero
+\item Find that the solution must be a Gibbs distribution that maximizes the data likelihood  
+\end{itemize}
+For a concise yet detailed derivation of this result, consult [XX]. \\
 
-$\forall (x,y) \in S: \hat{p}(y|x) = p(y|x; W,C)$\\
+When fixing either $\Phi$ or $p(\cdot|x)$ in \autoref{eq:maxent}, the objectiv ebecomes equivalent to the classical maximum entropy objective. Therefore we can conlude that the partial derivatives of $G$ and $H$ w.r.t $W$ and $\Phi$ will vanish for the same $W, \Phi$:
+\begin{align*}
+\dfrac{\partial G}{\partial W} &= 0
+ &\text{iff}& 
+&\dfrac{\partial H}{\partial W} &= 0  
+\intertext{and:}
+\dfrac{\partial G}{\partial \Phi} &= 0 
+ &\text{iff}& 
+&\dfrac{\partial H}{\partial \Phi} &= 0  
+\end{align*}  
+These properties tell us that the gradient of $H$
+\[\triangledown H = \left(\dfrac{\partial H}{\partial W},\dfrac{\partial H}{\partial \Phi}\right)\]
+will vanish if and only if the gradient of $G$ vanishes. Therefore, we can conclude that the two objectives have the same extrema as a vanishing gradient is a necessary condition for local extrema.
+\noindent The 
 
-\noindent Since the objective are not convex, we will 
-
-\begin{thebibliography}{1}
-\bibitem{word2vec1} Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean. {\em Efficient Estimation of Word Representations in Vector Space} arXiv:1301.3781v3 [cs.CL] 7 Sep 2013
-
-\bibitem{word2vec2} Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg Corrado, Jeffrey Dean. {\em Distributed Representations of Words and Phrases and their Compositionality} arXiv:1310.4546v1  [cs.CL]  16 Oct 2013
-
-\bibitem{word2vec_explained} Yoav Goldberg, Omar Levy. {\em word2vec Explained: Deriving Mikolov et al.'s Negative-Sampling Word-Embedding Method} arXiv:1402.3722v1  [cs.CL]  15 Feb 2014
-
-\end{thebibliography}
-
+\printbibliography
 \end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
