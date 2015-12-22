@@ -1,7 +1,7 @@
 \documentclass[]{article}
 
 %opening
-\title{Bregman Divergence and word2vec}
+\title{Conditional Maxent and word2vec}
 \author{Jonay Trenous, David Kasofsky}
 
 \usepackage{amsmath}
@@ -21,84 +21,108 @@
 %\usepackage[style=numeric]{biblatex}
 %\addbibresource{bib.bib}
 \pagestyle{fancy}
-\setlength{\parindent}{0in}
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
 
-\noindent The word-embedding models of Mikolov et al.\cite{word2vec1}\cite{word2vec2} are related to Bregman Divergence by the softmax function. The parametrized distribution resulting from the softmax is a Gibbs distribution, which arises from the choice of KL-divergence as a similarity measure. For maximum entropy models, it is known that the distribution that minimizes the KL-divergence is same Gibbs distribution that maximizes the likelihood of the data. From here we a give maximum entropy interpretation of word2vec using conditional relative entropy and an equivalent objective function.
+\noindent The word-embedding models of Mikolov et al.\cite{word2vec1}\cite{word2vec2} are related to Conditional Maximum Entropy by the softmax function. The parametrized distribution resulting from the softmax is a Gibbs distribution. For maximum entropy models, it is known that the distribution that minimizes the KL-divergence is same Gibbs distribution that maximizes the likelihood of the data. From here we a give conditional maximum entropy interpretation of word2vec using conditional relative entropy and an equivalent objective function. We outline the possible implications of this formulation.
 
 \end{abstract}
 
 \section{Introduction}
 
-word2vec\cite{word2vec1}\cite{word2vec2} is a recent promising word-embedding algorithm. It seeks to find vector representation of words in a corpus such that similar words (in the sense of meaning and usage) will have similar embeddings. This quality is merely a loose notion about what makes for good word embeddings and not a technical condition. Nonetheless, word2vec has produced some encouraging results\cite{dummy} that hint at the supposed quality of its word embeddings. A common example is that the embedding of, say, "France" would not be far from the embedding of "Spain"\cite{dummy} and that relations such as:\\
+word2vec\cite{word2vec1}\cite{word2vec2} is a recent promising word-embedding algorithm. It seeks to find vector representation of words in a corpus such that similar words (in the sense of meaning and usage) will have similar embeddings. This quality is merely a loose notion about what makes for good word embeddings and not a technical condition. Nonetheless, word2vec has produced some encouraging results that hint at the supposed quality of its word embeddings. A common example is that the embedding of, say, "France" would not be far from the embedding of "Spain" and that relations such as:\\
 
 $w2v(France) + w2v(Paris) \simeq w2v(Spain) + w2v(Madrid)$\\
 
-\noindent may hold, where $w2v(\cdot)$ is the embedding.
+\noindent may hold, where $w2v(\cdot)$ is the embedding.\\
 
-word2vec uses a skipgram model that predicts the context $y$ of a word $x$, i.e. $p(y|x)$. The training examples are generated from the corpus by taking the $R$ contexts $y$ before and after each word $x$. Thus each word in the corpus generates $2R$ word-context pairs. This can be thought of multiclass classification in which the most likely classes should be the words most likely to appear near the given word. It is presented as the following optimization objective:\\
+word2vec uses a so-called skipgram model that predicts the context $y$ of a word $x$, i.e. $p(y|x)$. The training examples are generated from the corpus by taking the $R$ contexts $y$ before and after each word $x$. Thus each word in the corpus generates $2R$ word-context pairs, forming a sample $S$ of training examples with size $m$. Note that both each word $x$ and context $y$ come from the same set, the vocabulary $V$. This can be thought of multiclass classification in which the most likely classes should be the words most likely to appear near the given word. It is presented as the following optimization objective:\\
 
-\begin{equation} \underset{W,\Phi}{\text{argmax}} \quad \underset{i \in m}{\Pi}{p(y_i|x_i; W, \Phi)}\label{eq:gibbs}\end{equation} 
+\begin{equation} \underset{\Psi,\Phi}{\text{argmax}} \quad \underset{i \in m}{\Pi}{p(y_i|x_i; \Psi, \Phi)}\label{eq:gibbs}\end{equation} 
 
-\noindent where $x_i$ is a word, $y_i$ a context of $x_i$, and $p$ is the softmax function parameterized by $W$ and $\Phi$:\\
+\noindent where $x$ is a word, $y$ a context of $x$, and $p$ is the softmax function parameterized by $\Psi$ and $\Phi$:\\
 
-$p(y_i|x_i; W,\Phi) = \frac{e^{W(x_i) \cdot \Phi(y_i)}}{\sum_{(x,y) \in S}e^{W(x) \cdot \Phi(y)}}$.\\
+$p(y|x; \Psi,\Phi) = \frac{e^{\Psi(y) \cdot \Phi(x)}}{\sum_{y\prime \in V}e^{\Psi(y\prime) \cdot \Phi(x)}}$.\\
 
-$W$ is the word-embedding function which maps a word $x_i$ to a $D$-dimensional vector, where $D$ is the dimension we have chosen for embedding. Similarly $\Phi$ is the context embedding function. One can also imagine $W$ and $\Phi$ as matrices with size $V \times D$, where $V$ is the size of the vocabulary of our sample $S$. Then $W(x_i)$ corresponds to the column of the matrix W containing the embedding for $x_i$.
+$\Phi$ is the word-embedding function which maps a word $x$ to a $D$-dimensional vector, where $D$ is the dimension we have chosen for embedding. Similarly $\Psi$ is the context embedding function. One can also imagine $\Psi$ and $\Phi$ as matrices with size $|V| \times D$. Then $\Phi(x)$ corresponds to the column of the matrix $\Phi$ containing the embedding for $x$ and similarly for $\Psi$.
 
-Thus word2vec is solving a maximum likelihood problem over Gibbs distributions, as the softmax defines a Gibbs distribution. However this objective is not convex as both $W$ and $\Phi$ are . When either is fixed this becomes the well-known objective from logistic regression, which is convex and equivalent to Maximum Entropy\cite{dummy}. We will show that there is a corresponding Maximum Entropy interpretation in the non-convex case as well. 
+Equivalently, we can maximize the log likelihood:
 
-\section{Maximum Entropy}
+\begin{equation} \underset{\Psi,\Phi}{\text{argmax}} \quad \underset{i \in m}{\sum}{\log p(y_i|x_i; \Psi, \Phi)}\label{eq:gibbs}\end{equation}\\
+
+Thus word2vec is solving a maximum likelihood problem over Gibbs distributions, as the softmax defines a Gibbs distribution. However this objective is not convex as it is parameterized by both $\Psi$ and $\Phi$. When  $\Phi$ is fixed, this is the well known objective from logistic regression and is equivalent to conditional maximum entropy. We will show that there is a corresponding Maximum Entropy interpretation in the non-convex case as well. First we will look at the partial derivatives of \autoref{eq:gibbs}.
+
+The partial derivative with respect to $\Psi_j$ is then:\\
+
+$\frac{\partial}{\partial \Psi_j} \underset{i \in m}{\sum} \log e^{\Psi(y_i) \cdot \Phi(x_i)} - \underset{i \in m}{\sum} \log \sum_{y\prime \in C}e^{\Psi(y') \cdot \Phi(x_i)}$\\
+
+$ = \underset{i \in m, y_i = j}{\sum} \Phi(x_i) - \frac{\partial}{\partial \Psi_j} \underset{i \in m}{\sum} \log \sum_{y\prime \in C}e^{\Psi(y') \cdot \Phi(x_i)}$\\
+
+$ = \underset{i \in m, y_i = j}{\sum} \Phi(x_i) -  \underset{i \in m}{\sum} \Phi(x_i) \frac{e^{\Psi_j \cdot \Phi(x_i)}}{\sum_{y\prime \in C}e^{\Psi(y') \cdot \Phi(x_i)}}$\\
+
+$ = \underset{i \in m, y_i = j}{\sum} \Phi(x_i) -  \underset{i \in m}{\sum} \Phi(x_i) p(j|x_i)$\\
+
+\noindent setting this to zero and some small algebra yields:
+
+$\underset{i \in m, y_i = j}{E}\left[\Phi(x_i)\right] = \underset{x_i \sim \hat{p}}{E}\left[\Phi(x_i) p(j|x_i)\right]$\\
+
+\noindent The partial derivative with respect to $\Phi_j$ is then:\\
+
+$\frac{\partial}{\partial \Phi_j} \underset{i \in m}{\sum} \log e^{\Psi(y_i) \cdot \Phi(x_i)} - \underset{i \in m}{\sum} \log \sum_{y\prime \in C}e^{\Psi(y') \cdot \Phi(x_i)}$\\
+
+$\frac{\partial}{\partial \Phi_j} \underset{i \in m}{\sum} \log e^{\Psi(y_i) \cdot \Phi(x_i)} - \underset{i \in m}{\sum} \log \sum_{y\prime \in C}e^{\Psi(y') \cdot \Phi(x_i)}$\\
+
+$ = \underset{i \in m, x_i = j}{\sum} \left[\Psi(y_i) - \frac{\partial}{\partial \Phi_j} \log \sum_{y\prime \in C}e^{\Psi(y\prime) \cdot \Phi(x_i)}\right]$\\
+
+$ = \underset{i \in m, x_i = j}{\sum} \left[\Psi(y_i) - \sum_{y\prime \in C}\Psi(y') \frac{e^{\Psi(y') \cdot \Phi(x_i)}}{\sum_{y\prime\prime \in C}e^{\Psi(y\prime\prime) \cdot \Phi(x_i)}}\right]$\\
+
+$ = \underset{i \in m, x_i = j}{\sum} \left[\Psi(y_i) - \sum_{y\prime \in C}\Psi(y') p(y\prime|x_i)\right]$\\
+
+$ = \underset{i \in m, x_i = j}{\sum} \Psi(y_i) - \underset{i \in m, x_i = j}{\sum} \sum_{y\prime \in C}\Psi(y') p(y\prime|x_i)$\\
+
+\noindent setting this to zero and some small algebra yields:
+
+$\underset{i \in m, x_i = j}{E}\left[\Psi(y_i)\right] = \underset{y\prime \sim p(\cdot|j)}{E}\left[\Psi(y\prime)\right]$
+
+\noindent This motivates the following Maximum Entropy formulation.
+
+\section{Conditional Maximum Entropy}
 
 In the Maximum Entropy formulation, we pose the objective:\\
 
-\begin{equation}\underset{p(\cdot | x), \Phi}{\text{argmin}} \quad E\left[ D(p(\cdot|x) \vert \vert  p_0(\cdot|x))\right] \label{eq:maxent}
+\begin{equation}\underset{p(\cdot | x), \Phi, \Psi}{\text{argmin}} \quad E\left[ D(p(\cdot|x) \vert \vert  p_0(\cdot|x))\right] \label{eq:maxent}
 \end{equation}
-\\
 
-\noindent subject to\\
+\noindent subject to:
 
-\begin{align}\underset{x \sim \hat{p}}{E}\left[\underset{y \sim p(\cdot|x)}{E}\left[\Phi(x,y)\right]\right] = \underset{(x,y) \in S}{E}\left[\Phi(x,y)\right]
+\begin{align}
+	\forall j \in V: \underset{i \in m, y_i = j}{E}\left[\Phi(x_i)\right] = \underset{x_i \sim \hat{p}}{E}\left[\Phi(x_i) p(j|x_i)\right]
+\end{align}
+\noindent and
+\begin{align}
+	\forall j \in V: \underset{i \in m, x_i = j}{E}\left[\Psi(y_i)\right] = \underset{y\prime \sim p(\cdot|j)}{E}\left[\Psi(y\prime)\right]
 \end{align}
 
-\begin{align}\underset{x \sim \hat{p}}{E}\left[\underset{y \sim p(\cdot|x)}{E}\left[W(x)\right]\right] = \underset{(x) \in S}{E}\left[W(x)\right]
-\end{align}
-
-\begin{align}\underset{x \sim \hat{p}}{E}\left[\underset{y \sim p(\cdot|x)}{E}\left[\Phi(x,y)\right]\right] = \underset{(x,y) \in S}{E}\left[\Phi(x,y)\right]
-\end{align}
-
-\noindent where $p_0$ is the uniform distribution and $\hat{p}$ is the sample distribution. Note that, as opposed to the classical maximum entropy objective, the feature function $\Phi$ itself is now a parameter to be optimized. It is well known that the classical maximum entropy objective can be reformulated as a Gibbs-parametrized maximum likelihood problem. A very broad outline of the proof goes as follows
+\noindent where $p_0$ is the uniform distribution, $\hat{p}$ is the sample distribution. Note that, as opposed to the classical conditional maximum entropy objective, the feature function $\Phi$ is now a parameter to be optimized. It is well known that the classical maximum entropy objective can be reformulated as a maximum likelihood problem over Gibbs distributions. A very broad outline of the proof goes as follows
 \begin{itemize}
-\item First, incorporate the constraints in the objective with the use of Lagrangian multipliers
-\item Set the gradients of the resulting unconstrained objective to zero
+\item Incorporate the constraints in the maxent objective with the use of Lagrangian multipliers
+\item Set the partial derivatives of the resulting unconstrained objective to zero
 \item Find that the solution must be a Gibbs distribution that maximizes the data likelihood  
 \end{itemize}
-For a concise yet detailed derivation of this result, consult [XX]. \\
+For a concise yet detailed derivation of this result, consult\cite{logregmaxent}.\\
 
-When fixing either $\Phi$ or $p(\cdot|x)$ in \autoref{eq:maxent}, the objectiv ebecomes equivalent to the classical maximum entropy objective. Therefore we can conlude that the partial derivatives of $G$ and $H$ w.r.t $W$ and $\Phi$ will vanish for the same $W, \Phi$:
-\begin{align*}
-\dfrac{\partial F}{\partial W} &= 0
- &\text{iff}& 
-&\dfrac{\partial G}{\partial W} &= 0  
-\intertext{and:}
-\dfrac{\partial F}{\partial \Phi} &= 0 
- &\text{iff}& 
-&\dfrac{\partial G}{\partial \Phi} &= 0  
-\end{align*}  
-These properties tell us that the gradient of $G$
-\[\triangledown G = \left(\dfrac{\partial G}{\partial W},\dfrac{\partial G}{\partial \Phi}\right)\]
-will vanish if and only if the gradient of $F$ vanishes. Therefore, we can conclude that the two objectives have the same extrema as a vanishing gradient is a necessary condition for local extrema.
+The critical part is that we will still arrive at a Gibbs distribution when taking the partial derivatives of the corresponding Lagrangian with respect to $p(\cdot|x)$, even in light of our additional constraint. The constraints enforce that any solution to the maximum entropy will also be a maximizer of the word2vec objective.
 
-$\triangledown F = 0 \iff \triangledown G = 0$
+While we didn't have the time to work through the details of the derivation which would confirm that we find a Gibbs distribution working from the Lagrangian, we believe that it would proceed similarly to the derivation found in \cite{logregmaxent} and we would find the probability distribution to be an exponential distribution parameterized by $\Phi$ and $\Psi$.
 
-$\underset{W}{\text{max}} \quad F(W) = \underset{p}{\text{min}} \quad G(p)$
-$\underset{\Phi}{\text{max}} \quad F(\Phi) = \underset{\Phi}{\text{min}} \quad G(\Phi)$
+\section{Conclusion}
 
-\noindent The 
+We showed the relationship between the word2vec objective and conditional maximum entropy. This is nice because it gives a reformulation of the objective which has a stronger theoretical motivation from information theory. This could motivate an analysis of the extrema that benefits from information-theoretical principles. Additionally, it is known that maximum entropy benefits from regularization and thus suggests that word2vec may also. This is especially interesting in light of the fact that in order to generate useful word embeddings, word2vec requires corpora on the order of several billion words. Thus regularization may enable word2vec to produce better results on smaller corpora.
+
+For future directions, one could examine if the learning bounds for maximum entropy methods carry over to the non-convex case. One could also use different Bregman Divergence to measure the similarity of the predicted distribution and the prior distribution and this would lead to a different exponential distribution instead of Gibbs. Also one could take a different prior distributions with are linguistically motivated, such as the Zipfian distribution.
 
 \begin{thebibliography}{1}
 	\bibitem{word2vec1} Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean. {\em Efficient Estimation of Word Representations in Vector Space} arXiv:1301.3781v3 [cs.CL] 7 Sep 2013
@@ -106,6 +130,9 @@ $\underset{\Phi}{\text{max}} \quad F(\Phi) = \underset{\Phi}{\text{min}} \quad G
 	\bibitem{word2vec2} Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg Corrado, Jeffrey Dean. {\em Distributed Representations of Words and Phrases and their Compositionality} arXiv:1310.4546v1  [cs.CL]  16 Oct 2013
 	
 	\bibitem{word2vec_explained} Yoav Goldberg, Omar Levy. {\em word2vec Explained: Deriving Mikolov et al.'s Negative-Sampling Word-Embedding Method} arXiv:1402.3722v1  [cs.CL]  15 Feb 2014
+	
+	\bibitem{logregmaxent} John Mount. The equivalence of logistic regression and maximum entropy
+	models. 23 September 2011. http://www.win-vector.com/dfiles/LogisticRegressionMaxEnt.pdf
 	
 \end{thebibliography}
 
