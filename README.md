@@ -6,6 +6,8 @@ and their Compositionality](http://arxiv.org/pdf/1310.4546.pdf)
 * [Goldberg & Levy - word2vec
 Explained:  Deriving Mikolov et al.’s
 Negative-Sampling Word-Embedding Method](http://arxiv.org/pdf/1402.3722v1.pdf)
+* [Levy & Goldberg - Neural Word Embedding
+as Implicit Matrix Factorization](http://papers.nips.cc/paper/5477-neural-word-embedding-as-implicit-matrix-factorization.pdf)
 * [Cortes et al - Structural Maxent Models](http://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43976.pdf)
 * [John Mount - The equivalence of logistic regression and maximum entropy
 models](http://www.win-vector.com/dfiles/LogisticRegressionMaxEnt.pdf)
