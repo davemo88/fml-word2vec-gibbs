@@ -68,6 +68,14 @@ $ = \underset{i \in m, y_i = j}{\sum} \Phi(x_i) -  \underset{i \in m}{\sum} \Phi
 
 $\underset{i \in m, y_i = j}{E}\left[\Phi(x_i)\right] = \underset{x_i \sim \hat{p}}{E}\left[\Phi(x_i) p(j|x_i)\right]$\\
 
+\noindent Furthermore, consider the second derivative with respect to $\Psi_j$:
+
+$\sum_{i=1}^{m} \Phi(x_i) \frac{\partial}{\partial \Psi_j} \frac{\Psi_j \cdot \Phi(x_i)}{\sum_{y\prime \in V} \exp(\Psi(y\prime) \cdot \Phi(x_i))}$\\
+
+$\sum_{i=1}^{m} \Phi(x_i)^2 \left[ \frac{\Psi_j \cdot \Phi(x_i)}{\sum_{y\prime \in V} \exp(\Psi(y\prime) \cdot \Phi(x_i))} (1 - \frac{\Psi_j \cdot \Phi(x_i)}{\sum_{y\prime \in V} \exp(\Psi(y\prime) \cdot \Phi(x_i))}) \right]$
+
+
+
 \noindent The partial derivative with respect to $\Phi_j$ is:\\
 
 $\frac{\partial}{\partial \Phi_j} \underset{i \in m}{\sum} \log e^{\Psi(y_i) \cdot \Phi(x_i)} - \underset{i \in m}{\sum} \log \sum_{y\prime \in C}e^{\Psi(y') \cdot \Phi(x_i)}$\\
@@ -105,7 +113,7 @@ In the Conditional Maximum Entropy formulation, we pose the objective:\\
 	\forall j \in V: \underset{i \in m, x_i = j}{E}\left[\Psi(y_i)\right] = \underset{y\prime \sim p(\cdot|j)}{E}\left[\Psi(y\prime)\right]
 \end{align}
 
-\noindent where $p_0$ is the uniform distribution, and $\hat{p}$ is the sample distribution. Note that, as opposed to the classical conditional maximum entropy objective, the feature function $\Phi$ is now a parameter to be optimized. It is well known that the classical maximum entropy objective can be reformulated as a maximum likelihood problem over Gibbs distributions. A very broad outline of the proof goes as follows
+\noindent where $p_0$ is the uniform distribution, and $\hat{p}$ is the sample distribution. Note that, as opposed to the classical conditional maximum entropy objective, the feature function $\Phi$ is now a parameter to be optimized. It is well known that the classical maximum entropy objective can be reformulated as a maximum likelihood problem over Gibbs distributions. A very broad outline of the proof goes:
 \begin{itemize}
 \item Incorporate the constraints in the maxent objective with the use of Lagrangian multipliers
 \item Set the partial derivatives of the resulting unconstrained objective to zero
@@ -118,7 +126,7 @@ The critical part is that we will still arrive at a Gibbs distribution when taki
 The Lagrangian $L$ is:
 
 \begin{equation}
-	L =  
+	L = 
 \end{equation}
 
 While we didn't have the time to work through the details of the derivation which would confirm that we find a Gibbs distribution working from the Lagrangian, we believe that it would proceed similarly to the derivation found in \cite{logregmaxent} and we would find the probability distribution to be an exponential distribution parameterized by $\Phi$ and $\Psi$.
